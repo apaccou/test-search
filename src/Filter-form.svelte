@@ -10,22 +10,6 @@
 
     $selectedFilters[filterName] = [];
     
-    // $: if($countFilters[all] > 0) {
-    //     $results = data.filter(result => [1,2,5].includes(result[filterName]));
-    // } else {
-    //     $results = data;
-    // }
-    
-</script>
-
-<script context="module">
-    // $: if($selectedFilters[filterName].length > 0) {
-    //     // $results = data.filter(result => $selectedFilters[filterName].includes(result.filterName));
-    //     $results = data.filter(result => [1,2,5].includes(result.star));
-    //     console.log(filterName);
-    // } else {
-    //     $results = data;
-    // }
 </script>
 
 {#if $debug}

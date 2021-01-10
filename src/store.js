@@ -1,6 +1,12 @@
+// Exemples de stores :
+// https://devlinduldulao.pro/svelte-in-a-nutshell-with-store-code-sample/
+// https://javascriptio.com/view/2159463/svelte-derived-stores-and-array-sort
+// https://tj.ie/derived-stores-with-svelte/
+
 import { readable, writable, derived } from 'svelte/store';
 
 export const debug = readable(false);
+export const data = writable([]);
 export const results = writable([]);
 export const selectedFilters = writable([]);
 export const selectedBudget = writable([]);

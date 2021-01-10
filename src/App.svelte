@@ -12,11 +12,10 @@
 	// https://httptoolkit.tech/blog/simple-graphql-server-without-apollo/
 
 	import { QueryClientProvider } from '@sveltestack/svelte-query';
-	import Simple from './Simple.svelte';
+	import LoadCampingList from './Load-camping-list.svelte';
 
 	import wNumb from 'wnumb';
-
-	import Result from './Result.svelte';
+	
 	import FilterReminder from './Filter-reminder.svelte';
 	import FilterForm from './Filter-form.svelte';
 	import FilterSlider from './Filter-slider.svelte';
@@ -24,63 +23,12 @@
 	import {selectedFilters} from './store.js';
 	import {selectedBudget} from './store.js';
 	import {countFilters} from './store.js';
-	import {results} from './store.js';
+	import {data, results} from './store.js';
 	import {debug} from './store.js';
 
 	import {filterPrice, setStart, setRange} from './store.js';	
 
 	export let name;
-
-
-	import { onMount } from 'svelte';	
-
-	const apiURL = 'http://localhost:5000/results.json';
-	let data = [];
-	// let results = [];
-
-
-
-	
-    onMount(async function() {
-        const response = await fetch(apiURL);
-		data = await response.json();
-		$results = data;
-
-		// Return Set of unique filter values		
-		function getSetFromFilter(filterName) {
-			let filterSet = [];
-			filterSet[filterName] = new Set();
-			data.forEach( item => {
-				filterSet[filterName].add(item[filterName]);
-			});
-			return filterSet[filterName];
-		}
-		// Return Sorted Array of unique filter values
-		// To get array instead of Set : [...filterSet[filterName]] ou Array.from()
-		function getUniqueArrayFromFilter(filterName) {
-			const uniqueArray = Array.from(getSetFromFilter(filterName));
-			if(checkIfAllValuesAreString(uniqueArray)) {
-				uniqueArray.sort();
-			}
-			if(checkIfAllValuesAreNumber(uniqueArray)) {
-				uniqueArray.sort((a, b) => a - b);
-			}
-			return uniqueArray;
-		}
-
-		const uniqueFilterPrice = getUniqueArrayFromFilter('price');
-		console.log(uniqueFilterPrice);
-		$filterPrice.min = Math.min(...uniqueFilterPrice);
-		$filterPrice.max = Math.max(...uniqueFilterPrice);
-
-		function checkIfAllValuesAreNumber(array) {
-			return array.every(x => typeof x == "number");
-		}
-		function checkIfAllValuesAreString(array) {
-			return array.every(x => typeof x == "string");
-		}
-
-	});
 
 	const stars = [
 		{value: 1, label: '1 étoile'},
@@ -89,59 +37,12 @@
 		{value: 4, label: '4 étoiles'},
 		{value: 5, label: '5 étoiles'},
 	];
-	// let selectedStars = [];
-	// $: filterXXX = filterByStar(selectedStars);
-
-	// function filterByStar() {
-	// 	let test = Array.from(selectedStars);
-	// 	// return results = results.filter(result => result.star == 5);
-	// 	if(test.length) {
-	// 		return $results = data.filter(result => Array.from(selectedStars).includes(result.star));
-	// 	} else {
-	// 		return $results = data;
-	// 	}		
-	// }
 
 	const types = [
 		{value: 'type_1', label: 'Mobil-home'},
 		{value: 'type_2', label: 'Hébergement insolite'},
 		{value: 'type_3', label: 'Hébergement toilé'},
-	];
-	// let selectedTypes = [];
-	// $: filterYYY = filterByType(selectedTypes);
-
-	// function filterByType() {
-	// 	let test = Array.from(selectedTypes);
-	// 	// return results = results.filter(result => result.star == 5);
-	// 	if(test.length) {
-	// 		return $results = data.filter(result => Array.from(selectedTypes).includes(result.type));
-	// 	} else {
-	// 		return $results = data;
-	// 	}		
-	// }
-
-
-	// En cours de test
-	// $: if($countFilters.all > 0) {
-	// 	console.log($results);		
-	// 	filterResults();		
-	// 	console.log($results);
-	// } else {
-	// 	$results = data;
-	// }
-	
-	// function filterResults() {
-	// 	const filters = Object.keys($selectedFilters);
-	// 	filters.forEach(filterName => {
-	// 		if($countFilters[filterName]) {
-	// 			$results = data.filter(result => Object.values($selectedFilters[filterName]).includes(result[filterName]));
-	// 		}			
-	// 	});
-	// 	console.log('ici');
-	// 	console.log($results);
-	// }
-
-	
+	];	
 
 	function buildFilter(filter) {
 		let query = {};
@@ -181,7 +82,7 @@
 
 	$: {		
 		const query = buildFilter($selectedFilters);
-		$results= filterData(data, query, $selectedBudget);
+		$results= filterData($data, query, $selectedBudget);
 	}
 
 
@@ -204,10 +105,6 @@
 		suffix: ' €'
 	});
 
-	// const selectedBudgetChange = event => {
-	// 	console.log(event);
-	// 	alert('cliked');
-	// }
 	function selectedBudgetChange(event) {
 		$selectedBudget.min = event.detail.values[0];
 		$selectedBudget.max = event.detail.values[1];
@@ -259,9 +156,9 @@
 
 		</div>
 		<div class="col-8">
-			{#each $results as result}
-			<Result {...result}/>
-			{/each}
+			<QueryClientProvider>
+				<LoadCampingList />
+			</QueryClientProvider>
 		</div>
 	</div>
 </div>
